@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FilmLog — Movie Watchlist & Review</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              dark: '#14181c',
+              surface: '#1e242b',
+              surfaceHover: '#262f38',
+              card: '#222831',
+              border: '#303843',
+              muted: '#8996a6',
+              green: '#00e054',
+              orange: '#ff8000',
+              blue: '#40bcf4'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #14181c;
+      color: #e1e7ed;
+    }
+    .poster-hover:hover .poster-overlay {
+      opacity: 1;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #14181c;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #303843;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #445060;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans selection:bg-brand-green selection:text-black">
+
+  <!-- TOP NAVBAR -->
+  <header class="sticky top-0 z-40 bg-brand-surface/95 backdrop-blur border-b border-brand-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & Navigation Links -->
+      <div class="flex items-center space-x-8">
+        <a href="#" onclick="switchTab('discover')" class="flex items-center space-x-2 group">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-green to-emerald-400 flex items-center justify-center text-black font-black text-xl shadow-lg shadow-brand-green/20 group-hover:scale-105 transition">
+            F
+          </div>
+          <span class="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+            Film<span class="text-brand-green">Log</span>
+            <span class="text-[10px] uppercase font-semibold tracking-wider px-1.5 py-0.5 rounded bg-brand-border text-brand-muted">GDGoC</span>
+          </span>
+        </a>
+
+        <!-- Main Nav Tabs -->
+        <nav class="hidden md:flex items-center space-x-1">
+          <button id="nav-discover" onclick="switchTab('discover')" class="nav-tab px-3 py-1.5 rounded-md text-sm font-medium transition text-white bg-brand-card">
+            🎬 Discover
+          </button>
+          <button id="nav-watchlist" onclick="switchTab('watchlist')" class="nav-tab px-3 py-1.5 rounded-md text-sm font-medium transition text-brand-muted hover:text-white">
+            📌 Watchlist <span id="watchlist-badge" class="ml-1 px-1.5 py-0.2 rounded-full text-xs bg-brand-border text-white hidden">0</span>
+          </button>
+          <button id="nav-watched" onclick="switchTab('watched')" class="nav-tab px-3 py-1.5 rounded-md text-sm font-medium transition text-brand-muted hover:text-white">
+            ⭐ Watched & Reviews
+          </button>
+          <button id="nav-ai" onclick="switchTab('ai')" class="nav-tab px-3 py-1.5 rounded-md text-sm font-medium transition text-brand-muted hover:text-white flex items-center gap-1.5">
+            <span class="inline-block w-2 h-2 rounded-full bg-brand-green animate-pulse"></span>
+            🤖 AI Recommendations
+          </button>
+        </nav>
+      </div>
+
+      <!-- Right Actions: Base URL setting & Auth Button -->
+      <div class="flex items-center space-x-3">
+        <!-- API URL Config Trigger -->
+        <button onclick="openApiConfigModal()" title="Configure Backend API URL" class="px-2.5 py-1.5 rounded-lg border border-brand-border bg-brand-card hover:bg-brand-surfaceHover text-xs flex items-center gap-1.5 text-brand-muted hover:text-white transition">
+          <span class="w-2 h-2 rounded-full bg-emerald-500" id="api-status-dot"></span>
+          <span class="font-mono hidden sm:inline" id="api-url-display">http://localhost:8000/api</span>
+          <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+        </button>
+
+        <!-- Auth Section -->
+        <div id="auth-container">
+          <!-- Dynamically populated by JS: either login buttons or user profile dropdown -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Nav Bar -->
+    <div class="md:hidden flex items-center justify-around border-t border-brand-border py-2 px-2 bg-brand-surface text-xs">
+      <button onclick="switchTab('discover')" class="mobile-nav-btn py-1 px-2 text-white font-medium">Discover</button>
+      <button onclick="switchTab('watchlist')" class="mobile-nav-btn py-1 px-2 text-brand-muted">Watchlist</button>
+      <button onclick="switchTab('watched')" class="mobile-nav-btn py-1 px-2 text-brand-muted">Watched</button>
+      <button onclick="switchTab('ai')" class="mobile-nav-btn py-1 px-2 text-brand-muted text-brand-green">AI Assistant</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- TAB 1: DISCOVER MOVIES -->
+    <section id="tab-discover" class="tab-content space-y-8">
+      <!-- Hero / Controls -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-brand-surface via-brand-surface to-brand-card p-6 rounded-2xl border border-brand-border">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Explore Films</h1>
+          <p class="text-sm text-brand-muted mt-1">Discover, track, and share your personal movie journey.</p>
+        </div>
+        <div class="flex items-center flex-wrap gap-2">
+          <button onclick="loadDiscoverMovies(true)" class="px-4 py-2 rounded-xl bg-brand-green text-black font-semibold text-sm hover:brightness-110 active:scale-95 transition flex items-center gap-2 shadow-lg shadow-brand-green/20">
+            <i data-lucide="shuffle" class="w-4 h-4"></i> Shuffle Movies
+          </button>
+          <div class="relative">
+            <i data-lucide="search" class="w-4 h-4 text-brand-muted absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="movie-search" placeholder="Filter title or director..." oninput="handleMovieFilter()" class="bg-brand-dark border border-brand-border rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder-brand-muted focus:outline-none focus:border-brand-green w-48 sm:w-64 transition" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Genre Pills -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 text-xs" id="genre-filters">
+        <button onclick="filterByGenre('ALL')" class="genre-btn px-3 py-1.5 rounded-full bg-white text-black font-semibold">All Genres</button>
+        <button onclick="filterByGenre('Sci-Fi')" class="genre-btn px-3 py-1.5 rounded-full bg-brand-surface border border-brand-border text-brand-muted hover:text-white">Sci-Fi</button>
+        <button onclick="filterByGenre('Action')" class="genre-btn px-3 py-1.5 rounded-full bg-brand-surface border border-brand-border text-brand-muted hover:text-white">Action</button>
+        <button onclick="filterByGenre('Drama')" class="genre-btn px-3 py-1.5 rounded-full bg-brand-surface border border-brand-border text-brand-muted hover:text-white">Drama</button>
+        <button onclick="filterByGenre('Crime')" class="genre-btn px-3 py-1.5 rounded-full bg-brand-surface border border-brand-border text-brand-muted hover:text-white">Crime</button>
+        <button onclick="filterByGenre('Animation')" class="genre-btn px-3 py-1.5 rounded-full bg-brand-surface border border-brand-border text-brand-muted hover:text-white">Animation</button>
+        <button onclick="filterByGenre('Thriller')" class="genre-btn px-3 py-1.5 rounded-full bg-brand-surface border border-brand-border text-brand-muted hover:text-white">Thriller</button>
+      </div>
+
+      <!-- Movie Grid -->
+      <div id="movie-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Empty / Loading State -->
+      <div id="movie-grid-status" class="py-16 text-center text-brand-muted hidden">
+        <div class="animate-spin w-8 h-8 border-2 border-brand-green border-t-transparent rounded-full mx-auto mb-3"></div>
+        <p>Loading movies from your backend...</p>
+      </div>
+    </section>
+
+    <!-- TAB 2: WATCHLIST -->
+    <section id="tab-watchlist" class="tab-content hidden space-y-6">
+      <div class="border-b border-brand-border pb-4 flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-white">My Watchlist</h2>
+          <p class="text-sm text-brand-muted">Films you plan to watch soon.</p>
+        </div>
+        <span id="watchlist-count" class="text-sm font-medium px-3 py-1 rounded-full bg-brand-surface border border-brand-border text-brand-muted">0 films</span>
+      </div>
+
+      <div id="watchlist-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div id="watchlist-empty" class="text-center py-20 bg-brand-surface/40 rounded-2xl border border-dashed border-brand-border hidden">
+        <i data-lucide="bookmark" class="w-12 h-12 mx-auto text-brand-muted mb-3 opacity-40"></i>
+        <h3 class="text-lg font-semibold text-white">Your watchlist is empty</h3>
+        <p class="text-sm text-brand-muted max-w-sm mx-auto mt-1 mb-4">Browse movies in the Discover tab and click the bookmark icon to start building your watchlist.</p>
+        <button onclick="switchTab('discover')" class="px-4 py-2 bg-brand-card hover:bg-brand-surface border border-brand-border rounded-xl text-sm font-medium text-white transition">
+          Browse Films
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 3: WATCHED & REVIEWS -->
+    <section id="tab-watched" class="tab-content hidden space-y-6">
+      <div class="border-b border-brand-border pb-4">
+        <h2 class="text-2xl font-bold text-white">Watched Movies & Journal</h2>
+        <p class="text-sm text-brand-muted">Your logged movie viewing history, ratings, and thoughts.</p>
+      </div>
+
+      <div id="watched-list" class="space-y-4 max-w-4xl">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div id="watched-empty" class="text-center py-20 bg-brand-surface/40 rounded-2xl border border-dashed border-brand-border hidden">
+        <i data-lucide="star" class="w-12 h-12 mx-auto text-brand-muted mb-3 opacity-40"></i>
+        <h3 class="text-lg font-semibold text-white">No watched logs yet</h3>
+        <p class="text-sm text-brand-muted max-w-sm mx-auto mt-1 mb-4">Mark movies as watched and record your personal reviews to see them here.</p>
+        <button onclick="switchTab('discover')" class="px-4 py-2 bg-brand-card hover:bg-brand-surface border border-brand-border rounded-xl text-sm font-medium text-white transition">
+          Discover Movies to Log
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 4: AI RECOMMENDATIONS (GEMINI POWERED) -->
+    <section id="tab-ai" class="tab-content hidden space-y-8 max-w-4xl mx-auto">
+      <!-- AI Header -->
+      <div class="text-center space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-green/10 border border-brand-green/30 text-brand-green text-xs font-semibold">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Powered by Google Gemini
+        </div>
+        <h2 class="text-3xl font-extrabold text-white tracking-tight">AI Movie Recommendation</h2>
+        <p class="text-brand-muted text-sm max-w-lg mx-auto">
+          Describe the vibe, plot ideas, or mood you want. The AI will analyze your query and match the best film available directly in your database.
+        </p>
+      </div>
+
+      <!-- AI Prompt Box -->
+      <div class="bg-brand-surface p-6 rounded-2xl border border-brand-border shadow-xl space-y-4">
+        <label for="ai-prompt-input" class="block text-xs font-semibold text-brand-muted uppercase tracking-wider">Your Movie Mood / Description</label>
+        <div class="relative">
+          <textarea id="ai-prompt-input" rows="3" placeholder="Contoh: 'Saya ingin film sci-fi misteri dengan twist akhir tak terduga yang bikin mikir keras seperti Inception atau Shutter Island'..." class="w-full bg-brand-dark border border-brand-border rounded-xl p-4 text-sm text-white placeholder-brand-muted/70 focus:outline-none focus:border-brand-green transition resize-none"></textarea>
+        </div>
+
+        <!-- Quick Idea Chips -->
+        <div class="space-y-1.5">
+          <span class="text-xs text-brand-muted">Try prompt ideas:</span>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <button onclick="setAiPrompt(this.innerText)" class="px-2.5 py-1 rounded-lg bg-brand-card border border-brand-border text-brand-muted hover:text-white hover:border-brand-green transition">
+              Film thriller kriminal dengan atmosfer gelap dan plot twist
+            </button>
+            <button onclick="setAiPrompt(this.innerText)" class="px-2.5 py-1 rounded-lg bg-brand-card border border-brand-border text-brand-muted hover:text-white hover:border-brand-green transition">
+              Animasi keluarga yang penuh petualangan dan visual memukau
+            </button>
+            <button onclick="setAiPrompt(this.innerText)" class="px-2.5 py-1 rounded-lg bg-brand-card border border-brand-border text-brand-muted hover:text-white hover:border-brand-green transition">
+              Film tentang ambisi, musik, dan obsesi psikologis yang intens
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-brand-border">
+          <span class="text-xs text-brand-muted">Endpoint: <code class="text-brand-green">POST /api/movies/recommend</code></span>
+          <button id="btn-submit-ai" onclick="submitAiRecommendation()" class="px-5 py-2.5 bg-brand-green text-black font-bold text-sm rounded-xl hover:brightness-110 active:scale-95 transition flex items-center gap-2 shadow-lg shadow-brand-green/20">
+            <i data-lucide="sparkles" class="w-4 h-4"></i> Ask AI
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Recommendation Result Card -->
+      <div id="ai-result-container" class="hidden">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MOVIE DETAIL MODAL -->
+  <div id="movie-detail-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+    <div class="bg-brand-surface border border-brand-border rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
+      <button onclick="closeMovieDetailModal()" class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-brand-dark/80 text-brand-muted hover:text-white flex items-center justify-center border border-brand-border transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div id="modal-detail-content" class="p-6">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL (LOGIN & REGISTER) -->
+  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+    <div class="bg-brand-surface border border-brand-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-brand-muted hover:text-white">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="flex items-center space-x-4 border-b border-brand-border pb-3 mb-5">
+        <button id="auth-tab-login" onclick="setAuthMode('login')" class="font-bold text-lg text-white border-b-2 border-brand-green pb-1">
+          Login
+        </button>
+        <button id="auth-tab-register" onclick="setAuthMode('register')" class="font-medium text-lg text-brand-muted hover:text-white pb-1">
+          Register
+        </button>
+      </div>
+
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div id="field-username-container" class="space-y-1.5 hidden">
+          <label class="text-xs font-semibold text-brand-muted uppercase">Username</label>
+          <input type="text" id="auth-username" placeholder="johndoe" class="w-full bg-brand-dark border border-brand-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-brand-green" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold text-brand-muted uppercase">Email Address</label>
+          <input type="email" id="auth-email" required placeholder="user@example.com" class="w-full bg-brand-dark border border-brand-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-brand-green" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold text-brand-muted uppercase">Password</label>
+          <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-brand-dark border border-brand-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-brand-green" />
+        </div>
+
+        <div id="auth-error-msg" class="text-xs text-rose-400 bg-rose-950/40 border border-rose-900/50 p-2.5 rounded-lg hidden"></div>
+
+        <button type="submit" id="auth-submit-btn" class="w-full py-2.5 bg-brand-green text-black font-bold text-sm rounded-xl hover:brightness-110 transition mt-2">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- API BASE URL CONFIG MODAL -->
+  <div id="api-config-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+    <div class="bg-brand-surface border border-brand-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <button onclick="closeApiConfigModal()" class="absolute top-4 right-4 text-brand-muted hover:text-white">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="sliders" class="w-5 h-5 text-brand-green"></i>
+        <h3 class="text-lg font-bold text-white">Backend API Settings</h3>
+      </div>
+      <p class="text-xs text-brand-muted mb-4">Set the base endpoint where your backend server is running (local or deployed URL).</p>
+
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs font-semibold text-brand-muted uppercase block mb-1">API Base URL</label>
+          <input type="text" id="api-base-url-input" class="w-full bg-brand-dark border border-brand-border rounded-xl px-3.5 py-2 text-sm font-mono text-white focus:outline-none focus:border-brand-green" value="http://localhost:8000/api" />
+        </div>
+
+        <div class="flex flex-wrap gap-2 text-xs">
+          <span class="text-brand-muted self-center">Presets:</span>
+          <button onclick="setApiUrlPreset('http://localhost:8000/api')" class="px-2 py-1 rounded bg-brand-dark border border-brand-border text-brand-muted hover:text-white font-mono">:8000/api</button>
+          <button onclick="setApiUrlPreset('http://localhost:3000/api')" class="px-2 py-1 rounded bg-brand-dark border border-brand-border text-brand-muted hover:text-white font-mono">:3000/api</button>
+          <button onclick="setApiUrlPreset('http://localhost:5000/api')" class="px-2 py-1 rounded bg-brand-dark border border-brand-border text-brand-muted hover:text-white font-mono">:5000/api</button>
+        </div>
+
+        <button onclick="saveApiBaseUrl()" class="w-full py-2.5 bg-brand-green text-black font-bold text-sm rounded-xl hover:brightness-110 transition mt-2">
+          Save & Reconnect
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl bg-brand-card border border-brand-border shadow-2xl text-sm text-white transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <span id="toast-icon"></span>
+    <span id="toast-message">Message</span>
+  </div>
+
+  <!-- DEV LOGS DRAWER (BOTTOM) -->
+  <div class="border-t border-brand-border bg-brand-surface/90 text-xs text-brand-muted">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-brand-green"></span>
+        <span class="font-mono text-white font-semibold">API Inspector</span>
+        <span class="text-[11px] text-brand-muted hidden sm:inline">— See real-time network requests sent to your backend</span>
+      </div>
+      <button onclick="toggleLogsDrawer()" class="flex items-center gap-1 hover:text-white transition">
+        <span id="log-drawer-text">Show Logs</span>
+        <i data-lucide="chevron-up" id="log-drawer-icon" class="w-3.5 h-3.5 transition-transform"></i>
+      </button>
+    </div>
+    <div id="logs-content" class="max-w-7xl mx-auto px-4 pb-3 hidden font-mono text-[11px] max-h-48 overflow-y-auto space-y-1">
+      <div class="text-brand-muted italic py-1">No API requests recorded yet.</div>
+    </div>
+  </div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
