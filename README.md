@@ -11,10 +11,12 @@ A REST API for a movie watchlist and review app. Users register and log in, brow
 | | Link |
 | --- | --- |
 | Live frontend | https://hacker-backend-assignment-gdgoc-fro.vercel.app/ |
-| Live API | https://hacker-backend-assignment-gdgoc.onrender.com/api |
+| Live API | https://hacker-backend-assignment-gdgoc.onrender.com/api/movies |
 | Demo video | https://drive.google.com/file/d/17JqMgSEB2FTQFxHUbGyE72rz7v_5Q7M3/view?usp=sharing |
 
-The API runs on Render's free plan, so it sleeps when nobody uses it. The first request can take up to a minute. Open [`/api/health`](https://hacker-backend-assignment-gdgoc.onrender.com/api/health) first to wake it up.
+The API runs on Render's free plan, so it sleeps when nobody uses it. The first request can take up to a minute, so the first click on the links above may look like it is loading forever. Just wait, and it will load. You can also open [`/api/health`](https://hacker-backend-assignment-gdgoc.onrender.com/api/health) first to wake it up.
+
+> **Note about the AI feature:** the AI recommendation can be slow on the live site (usually 3 to 10 seconds, longer if the server was asleep). It sends the whole movie catalog to Google Gemini and waits for the answer, and the live API runs on free plans. Please wait for the reply, it is not frozen.
 
 Deployed with: **Neon** (PostgreSQL), **Render** (Go API), **Vercel** (frontend).
 
