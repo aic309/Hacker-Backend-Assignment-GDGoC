@@ -6,10 +6,7 @@ A REST API for a movie watchlist and review app. Users register and log in, brow
 
 **Stack:** Go (standard library `net/http`), PostgreSQL (`pgx`), bcrypt, JWT, Google Gemini.
 
-| | Link |
-| --- | --- |
-| Demo video | ADD_VIDEO_LINK_HERE |
-| Live API | ADD_RENDER_LINK_HERE (optional) |
+
 | Live frontend | ADD_VERCEL_LINK_HERE (optional) |
 
 ## What is in this repo
