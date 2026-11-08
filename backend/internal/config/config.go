@@ -27,7 +27,7 @@ func Load() (*Config, error) {
 		DatabaseURL:  getenv("DATABASE_URL", "postgres://localhost:5432/moviedb?sslmode=disable"),
 		JWTSecret:    os.Getenv("JWT_SECRET"),
 		GeminiAPIKey: os.Getenv("GEMINI_API_KEY"),
-		GeminiModel:  getenv("GEMINI_MODEL", "gemini-3.8-flash"),
+		GeminiModel:  getenv("GEMINI_MODEL", "gemini-3.5-flash-lite"),
 		Port:         getenv("PORT", "8000"),
 		CORSOrigins:  splitList(getenv("CORS_ORIGINS", "*")),
 	}

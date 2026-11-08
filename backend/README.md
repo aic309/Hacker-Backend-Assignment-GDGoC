@@ -39,7 +39,7 @@ The tables are created automatically when the server (or the seed command) start
 | `JWT_SECRET` | yes | Secret that signs the tokens. At least 32 characters, or the server refuses to start. |
 | `DATABASE_URL` | yes | `postgres://USER:PASSWORD@HOST:PORT/DBNAME?sslmode=disable`. Default `postgres://localhost:5432/moviedb?sslmode=disable` |
 | `GEMINI_API_KEY` | for `/recommend` | Key from Google AI Studio. Without it, `/recommend` answers 503 and everything else still works. |
-| `GEMINI_MODEL` | no | Default `gemini-3.8-flash`. Change it if Google renames or retires a model. |
+| `GEMINI_MODEL` | no | Default `gemini-3.5-flash-lite`. Change it if Google renames or retires a model. |
 | `JWT_EXPIRE_MINUTES` | no | Default `60` |
 | `PORT` | no | Default `8000` |
 | `CORS_ORIGINS` | no | Frontend addresses allowed to call the API, comma separated. Default `*` |
