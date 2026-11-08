@@ -79,7 +79,7 @@ Base URL `http://localhost:8000/api`. Protected routes need `Authorization: Bear
 
 Errors are always JSON like `{"error": "message"}`. Codes used: 400, 401, 404, 409, 413, 500, 502, 503. The full list of when each one is used is in `backend/README.md`.
 
-A Postman collection is in `backend/postman/`. Import it, register, log in, and the token is saved for the other requests.
+A Postman collection is in `postman/`. Import it, register, log in, and the token is saved for the other requests.
 
 ## Tests
 
