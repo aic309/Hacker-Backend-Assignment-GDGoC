@@ -12,7 +12,7 @@ A REST API for a movie watchlist and review app. Users register and log in, brow
 | --- | --- |
 | Live frontend | https://hacker-backend-assignment-gdgoc-fro.vercel.app/ |
 | Live API | https://hacker-backend-assignment-gdgoc.onrender.com/api |
-| Explanation video | https://drive.google.com/file/d/17JqMgSEB2FTQFxHUbGyE72rz7v_5Q7M3/view?usp=sharing |
+| Demo video | ADD_VIDEO_LINK_HERE |
 
 The API runs on Render's free plan, so it sleeps when nobody uses it. The first request can take up to a minute. Open [`/api/health`](https://hacker-backend-assignment-gdgoc.onrender.com/api/health) first to wake it up.
 
@@ -50,7 +50,8 @@ More detail about the backend code is in [`backend/README.md`](backend/README.md
 **You need:** Go 1.23+, PostgreSQL 14+ (running), and a free Gemini API key from https://aistudio.google.com
 
 ```bash
-cd backend
+git clone https://github.com/aic309/Hacker-Backend-Assignment-GDGoC.git
+cd Hacker-Backend-Assignment-GDGoC/backend
 createdb moviedb
 cp .env.example .env
 openssl rand -hex 32
@@ -59,15 +60,16 @@ go run ./cmd/seed
 go run ./cmd/api
 ```
 
-1. `createdb moviedb` makes an empty database.
-2. Open `.env` and fill in the values from the table below. Use the output of `openssl rand -hex 32` as `JWT_SECRET`.
-3. `go run ./cmd/seed` loads the 20 movies. It is safe to run many times.
-4. `go run ./cmd/api` starts the server at http://localhost:8000. The tables are created automatically.
+1. `git clone` downloads the project. You can also click **Code → Download ZIP** on GitHub and unzip it.
+2. `createdb moviedb` makes an empty database.
+3. Open `.env` and fill in the values from the table below. Use the output of `openssl rand -hex 32` as `JWT_SECRET`.
+4. `go run ./cmd/seed` loads the 20 movies. It is safe to run many times.
+5. `go run ./cmd/api` starts the server at http://localhost:8000. The tables are created automatically.
 
 To try the frontend, open a second terminal:
 
 ```bash
-cd frontend
+cd Hacker-Backend-Assignment-GDGoC/frontend
 python3 -m http.server 3000
 ```
 
