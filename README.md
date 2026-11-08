@@ -12,7 +12,7 @@ A REST API for a movie watchlist and review app. Users register and log in, brow
 | --- | --- |
 | Live frontend | https://hacker-backend-assignment-gdgoc-fro.vercel.app/ |
 | Live API | https://hacker-backend-assignment-gdgoc.onrender.com/api |
-| Demo video | https://drive.google.com/file/d/17JqMgSEB2FTQFxHUbGyE72rz7v_5Q7M3/view?usp=sharing|
+| Demo video | https://drive.google.com/file/d/17JqMgSEB2FTQFxHUbGyE72rz7v_5Q7M3/view?usp=sharing |
 
 The API runs on Render's free plan, so it sleeps when nobody uses it. The first request can take up to a minute. Open [`/api/health`](https://hacker-backend-assignment-gdgoc.onrender.com/api/health) first to wake it up.
 
@@ -49,22 +49,79 @@ More detail about the backend code is in [`backend/README.md`](backend/README.md
 
 **You need:** Go 1.23+, PostgreSQL 14+ (running), and a free Gemini API key from https://aistudio.google.com
 
+**Step 1: Download the project and make the settings file**
+
 ```bash
 git clone https://github.com/aic309/Hacker-Backend-Assignment-GDGoC.git
 cd Hacker-Backend-Assignment-GDGoC/backend
 createdb moviedb
 cp .env.example .env
 openssl rand -hex 32
+```
+
+`git clone` downloads the project. You can also click **Code → Download ZIP** on GitHub and unzip it. `createdb moviedb` makes an empty database. `openssl rand -hex 32` prints a random secret.
+
+**Step 2: Fill in `.env` (do not skip this)**
+
+The `.env` file holds the settings and secrets of the server. Step 1 made it as a copy of `.env.example`, and it still has placeholder values. You must change 3 lines.
+
+*2a. Get a Gemini API key (free)*
+
+1. Go to https://aistudio.google.com and sign in with a Google account.
+2. Click **Get API key**, then **Create API key**.
+3. Copy the key. It starts with `AIza`.
+
+*2b. Open the file*
+
+In the `backend` folder, run one of these:
+
+```bash
+open -e .env
+```
+
+```bash
+nano .env
+```
+
+- `open -e .env` opens it in TextEdit (Mac). Save with `Cmd + S`.
+- `nano .env` edits it in the terminal. Save with `Ctrl + O`, then `Enter`, then exit with `Ctrl + X`.
+- On Windows or Linux, open `.env` in any text editor. It is a hidden file because its name starts with a dot.
+
+*2c. Change these 3 lines*
+
+The file looks like this. Change only the lines marked with an arrow:
+
+```
+DATABASE_URL=postgres://localhost:5432/moviedb?sslmode=disable    <- check this
+JWT_SECRET=change-me                                              <- change this
+JWT_EXPIRE_MINUTES=60
+GEMINI_API_KEY=                                                   <- change this
+GEMINI_MODEL=gemini-3.5-flash-lite
+PORT=8000
+CORS_ORIGINS=*
+```
+
+| Line | What to put | Example |
+| --- | --- | --- |
+| `DATABASE_URL` | Must end with the database name from Step 1 (`moviedb`). The default works if PostgreSQL uses your computer username with no password. If you set a password, write `postgres://USER:PASSWORD@localhost:5432/moviedb?sslmode=disable`. | `postgres://localhost:5432/moviedb?sslmode=disable` |
+| `JWT_SECRET` | The long text printed by `openssl rand -hex 32` in Step 1. At least 32 characters. | `d8a7516bd9a1c0be...` |
+| `GEMINI_API_KEY` | The key from 2a. No quotes, no spaces. | `AIzaSy...` |
+
+Rules: no spaces around `=`, no quotes, one value per line.
+
+If you skip this step, the server stops with `JWT_SECRET must be at least 32 characters`. If `/recommend` gives 503, the Gemini key is empty.
+
+**Step 3: Load the movies and start the server**
+
+```bash
 go mod tidy
 go run ./cmd/seed
 go run ./cmd/api
 ```
 
-1. `git clone` downloads the project. You can also click **Code → Download ZIP** on GitHub and unzip it.
-2. `createdb moviedb` makes an empty database.
-3. Open `.env` and fill in the values from the table below. Use the output of `openssl rand -hex 32` as `JWT_SECRET`.
-4. `go run ./cmd/seed` loads the 20 movies. It is safe to run many times.
-5. `go run ./cmd/api` starts the server at http://localhost:8000. The tables are created automatically.
+`go run ./cmd/seed` loads the 20 movies (safe to run many times). `go run ./cmd/api` starts the server at http://localhost:8000 and creates the tables automatically.
+
+Check it works: open http://localhost:8000/api/health in a browser.
 
 To try the frontend, open a second terminal:
 
@@ -188,4 +245,3 @@ HTTP request -> middleware (CORS, token) -> handler -> repository -> PostgreSQL
 
 - There is no separate service layer. The app is small, so the logic sits in the handlers and helper packages. I would add one if the business rules grew.
 - Gemini is behind a small interface, so the tests use a fake Gemini and need no real key.
-
