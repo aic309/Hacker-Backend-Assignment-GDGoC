@@ -12,7 +12,7 @@ A REST API for a movie watchlist and review app. Users register and log in, brow
 | --- | --- |
 | Live frontend | https://hacker-backend-assignment-gdgoc-fro.vercel.app/ |
 | Live API | https://hacker-backend-assignment-gdgoc.onrender.com/api |
-| Demo video | ADD_VIDEO_LINK_HERE |
+| Demo video | https://drive.google.com/file/d/17JqMgSEB2FTQFxHUbGyE72rz7v_5Q7M3/view?usp=sharing|
 
 The API runs on Render's free plan, so it sleeps when nobody uses it. The first request can take up to a minute. Open [`/api/health`](https://hacker-backend-assignment-gdgoc.onrender.com/api/health) first to wake it up.
 
