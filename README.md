@@ -11,9 +11,11 @@ A REST API for a movie watchlist and review app. Users register and log in, brow
 ## What is in this repo
 
 ```
-backend/    the Go API (all the code, tests, Postman collection, .env.example)
+backend/    the Go API (code, tests, .env.example)
 frontend/   the starter frontend, works with the API without changes
 data/       the 20 starter movies
+postman/    the Postman collection to try every endpoint
+docs/       the ERD and Postman screenshots
 ```
 
 The full API reference, database design, security notes and Gemini explanation are in [`backend/README.md`](backend/README.md).
